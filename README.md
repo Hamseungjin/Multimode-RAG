@@ -1,7 +1,9 @@
 
 
 # Multimode-RAG
-![image.png](attachment:903703b6-434d-4930-9396-694117c98046:image.png)
+
+![image](https://github.com/user-attachments/assets/54825b8f-6339-4079-9bb3-da9a50a8bf3e)
+
 
 1. Extract text, tables, and images from PDF files using partitioning techniques and document structure analysis.
 분할 기술과 문서 구조 분석을 사용하여 PDF 파일에서 텍스트, 표 및 이미지를 추출. PDF 낱장으로 분리후 -> 이미지(표, 차트)를 바운딩박스로 설정하여 크롭한후 저장 
@@ -45,16 +47,16 @@ LLM 임베딩이 포함된 Chroma 벡터 저장소를 사용하여 벡터 저장
 
 ## Stack
 
-###1. Vector DB
+1. Vector DB
 - Qdrant
 - chroma(고려중.)
 
-###2. VLM
+2. VLM
 - Qwen 2.5 VL 13B
 
-###3. LLM
+3. LLM
 - deepseek r1-7b
 - exaone 3.5
 
-###4. Chunking
+4. Chunking
 - Docling
