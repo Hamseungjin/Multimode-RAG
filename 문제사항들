@@ -1,0 +1,364 @@
+# 문제. FlashAttention2 has been toggled on, but it cannot be used due to the following error: you need flash_attn package version to be greater or equal than 2.1.0. Detected version 1.0.4. Please refer to the documentation of https://huggingface.co/docs/transformers/perf_infer_gpu_one#flashattention-2 to install Flash Attention 2.
+
+## 전제: 
+
+1) Flash Attention은 CUDA 버전이 11.6 이상이 필요함. 
+
+2) PyTorch 버전: 2.7.0+cu126
+  CUDA 사용 가능: True
+  CUDA 버전: 12.6
+  cuDNN 버전: 90501
+  GPU 모델: NVIDIA GeForce RTX 3090
+
+
+### 0. pip install -q docling[vlm] ipython 설치.
+
+### 1. flash_atten package 2.1.0이상여야하는데 현재 탐지된 버전은 1.0.4임.
+
+### 2. 그래서 flash_atten packer 2.1.0 다운받을려고함. 
+pip install flash-attn==2.1.0 --no-build-isolation설치할려고 하는데
+" Could not build wheels for flash-attn, which is required to install pyproject "나옴.
+
+### 3. https://pypi.org/project/flash-attn/에 따르면, CUDA toolkit or ROCm toolkit + PyTorch 2.2 and above. + packaging Python package (pip install packaging) + ninja Python package (pip install ninja)
+ninja, packagin설치를 해봄.
+
+### 4. 설치하니 해결됨. ㅋㅋ
+
+--------------------------------------------------------------------
+
+# 문제 
+
+ImportError                               Traceback (most recent call last)
+Cell In[35], line 6
+      3 import time
+      4 from pathlib import Path
+----> 6 from docling.datamodel.base_models import InputFormat
+      7 from docling.datamodel.pipeline_options import (
+      8     AcceleratorDevice,
+      9     AcceleratorOptions,
+     10     PdfPipelineOptions,
+     11     PictureDescriptionVlmOptions
+     12 )
+     13 from docling.document_converter import DocumentConverter, PdfFormatOption
+
+File /usr/local/lib/python3.10/dist-packages/docling/datamodel/base_models.py:4
+      1 from enum import Enum
+      2 from typing import TYPE_CHECKING, Dict, List, Optional, Union
+----> 4 from docling_core.types.doc import (
+      5     BoundingBox,
+      6     DocItemLabel,
+      7     NodeItem,
+      8     PictureDataType,
+      9     Size,
+     10     TableCell,
+     11 )
+     12 from docling_core.types.doc.page import SegmentedPdfPage, TextCell
+     14 # DO NOT REMOVE; explicitly exposed from this location
+
+File /usr/local/lib/python3.10/dist-packages/docling_core/types/__init__.py:8
+      1 #
+      2 # Copyright IBM Corp. 2024 - 2024
+      3 # SPDX-License-Identifier: MIT
+      4 #
+      6 """Define the main types."""
+----> 8 from docling_core.types.doc.document import DoclingDocument
+      9 from docling_core.types.gen.generic import Generic
+     10 from docling_core.types.rec.record import Record
+
+File /usr/local/lib/python3.10/dist-packages/docling_core/types/doc/__init__.py:8
+      1 #
+      2 # Copyright IBM Corp. 2024 - 2024
+      3 # SPDX-License-Identifier: MIT
+      4 #
+      6 """Package for models defined by the Document type."""
+----> 8 from .base import BoundingBox, CoordOrigin, ImageRefMode, Size
+      9 from .document import (
+     10     CodeItem,
+     11     DocItem,
+   (...)
+     30     TextItem,
+     31 )
+     32 from .labels import DocItemLabel, GroupLabel, TableCellLabel
+
+File /usr/local/lib/python3.10/dist-packages/docling_core/types/doc/base.py:6
+      3 from enum import Enum
+      4 from typing import List, Tuple
+----> 6 from pydantic import BaseModel
+      9 class ImageRefMode(str, Enum):
+     10     """ImageRefMode."""
+
+File /usr/local/lib/python3.10/dist-packages/pydantic/__init__.py:5
+      2 from importlib import import_module
+      3 from warnings import warn
+----> 5 from ._migration import getattr_migration
+      6 from .version import VERSION
+      8 if typing.TYPE_CHECKING:
+      9     # import of virtually everything is supported via `__getattr__` below,
+     10     # but we need them here for type checking and IDE support
+
+File /usr/local/lib/python3.10/dist-packages/pydantic/_migration.py:4
+      1 import sys
+      2 from typing import Any, Callable
+----> 4 from .version import version_short
+      6 MOVED_IN_V2 = {
+      7     'pydantic.utils:version_info': 'pydantic.version:version_info',
+      8     'pydantic.error_wrappers:ValidationError': 'pydantic:ValidationError',
+   (...)
+     13     'pydantic.generics:GenericModel': 'pydantic.BaseModel',
+     14 }
+     16 DEPRECATED_MOVED_IN_V2 = {
+     17     'pydantic.tools:schema_of': 'pydantic.deprecated.tools:schema_of',
+     18     'pydantic.tools:parse_obj_as': 'pydantic.deprecated.tools:parse_obj_as',
+   (...)
+     28     'pydantic.config:Extra': 'pydantic.deprecated.config:Extra',
+     29 }
+
+File /usr/local/lib/python3.10/dist-packages/pydantic/version.py:5
+      1 """The `version` module holds the version information for Pydantic."""
+      3 from __future__ import annotations as _annotations
+----> 5 from pydantic_core import __version__ as __pydantic_core_version__
+      7 __all__ = 'VERSION', 'version_info'
+      9 VERSION = '2.11.4'
+
+File /usr/local/lib/python3.10/dist-packages/pydantic_core/__init__.py:30
+      4 from typing import Any as _Any
+      6 from ._pydantic_core import (
+      7     ArgsKwargs,
+      8     MultiHostUrl,
+   (...)
+     28     validate_core_schema,
+     29 )
+---> 30 from .core_schema import CoreConfig, CoreSchema, CoreSchemaType, ErrorType
+     32 if _sys.version_info < (3, 11):
+     33     from typing_extensions import NotRequired as _NotRequired
+
+File /usr/local/lib/python3.10/dist-packages/pydantic_core/core_schema.py:16
+     13 from re import Pattern
+     14 from typing import TYPE_CHECKING, Any, Callable, Literal, Union
+---> 16 from typing_extensions import deprecated
+     18 if sys.version_info < (3, 12):
+     19     from typing_extensions import TypedDict
+
+cannot import name 'deprecated' from 'typing_extensions' (/usr/local/lib/python3.10/dist-packages/typing_extensions.py)
+
+
+## 전제: 
+
+1) PyTorch 버전: 2.1.0+cu118
+CUDA 사용 가능: True
+CUDA 버전: 11.8
+cuDNN 버전: 8700
+GPU 모델: NVIDIA GeForce RTX 3090
+
+2) Package                           Version
+--------------------------------- -------------
+accelerate                        1.6.0
+annotated-types                   0.7.0
+anyio                             4.0.0
+argon2-cffi                       23.1.0
+argon2-cffi-bindings              21.2.0
+arrow                             1.3.0
+asttokens                         2.4.1
+async-lru                         2.0.4
+attrs                             23.1.0
+Babel                             2.13.1
+beautifulsoup4                    4.13.4
+bleach                            6.1.0
+blinker                           1.4
+certifi                           2025.4.26
+cffi                              1.16.0
+charset-normalizer                2.1.1
+click                             8.2.0
+comm                              0.2.0
+cryptography                      3.4.8
+dbus-python                       1.2.18
+debugpy                           1.8.0
+decorator                         5.1.1
+defusedxml                        0.7.1
+dill                              0.4.0
+distro                            1.7.0
+docling                           2.31.0
+docling-core                      2.30.0
+docling-ibm-models                3.4.3
+docling-parse                     4.0.1
+easyocr                           1.7.2
+einops                            0.8.1
+entrypoints                       0.4
+et_xmlfile                        2.0.0
+exceptiongroup                    1.1.3
+executing                         2.0.1
+fastjsonschema                    2.18.1
+filelock                          3.9.0
+filetype                          1.2.0
+flash_attn                        2.7.4.post1
+fqdn                              1.5.1
+fsspec                            2025.3.2
+hf-xet                            1.1.0
+httplib2                          0.20.2
+huggingface-hub                   0.31.1
+idna                              3.4
+imageio                           2.37.0
+importlib-metadata                4.6.4
+ipykernel                         6.26.0
+ipython                           8.17.2
+ipython-genutils                  0.2.0
+ipywidgets                        8.1.1
+isoduration                       20.11.0
+jedi                              0.19.1
+jeepney                           0.7.1
+Jinja2                            3.1.2
+json5                             0.9.14
+jsonlines                         3.1.0
+jsonpointer                       2.4
+jsonref                           1.1.0
+jsonschema                        4.19.2
+jsonschema-specifications         2023.7.1
+jupyter-archive                   3.4.0
+jupyter_client                    7.4.9
+jupyter-contrib-core              0.4.2
+jupyter-contrib-nbextensions      0.7.0
+jupyter_core                      5.5.0
+jupyter-events                    0.9.0
+jupyter-highlight-selected-word   0.2.0
+jupyter-lsp                       2.2.0
+jupyter-nbextensions-configurator 0.6.3
+jupyter_server                    2.10.0
+jupyter_server_terminals          0.4.4
+jupyterlab                        4.0.8
+jupyterlab-pygments               0.2.2
+jupyterlab_server                 2.25.0
+jupyterlab-widgets                3.0.9
+keyring                           23.5.0
+latex2mathml                      3.78.0
+launchpadlib                      1.10.16
+lazr.restfulclient                0.14.4
+lazr.uri                          1.0.6
+lazy_loader                       0.4
+lxml                              4.9.3
+markdown-it-py                    3.0.0
+marko                             2.1.3
+MarkupSafe                        2.1.2
+matplotlib-inline                 0.1.6
+mdurl                             0.1.2
+mistune                           3.0.2
+more-itertools                    8.10.0
+mpire                             2.10.2
+mpmath                            1.3.0
+multiprocess                      0.70.18
+nbclassic                         1.0.0
+nbclient                          0.9.0
+nbconvert                         7.11.0
+nbformat                          5.9.2
+nest-asyncio                      1.5.8
+networkx                          3.0
+ninja                             1.11.1.4
+notebook                          6.5.5
+notebook_shim                     0.2.3
+numpy                             2.2.5
+nvidia-cublas-cu12                12.1.3.1
+nvidia-cuda-cupti-cu12            12.1.105
+nvidia-cuda-nvrtc-cu12            12.1.105
+nvidia-cuda-runtime-cu12          12.1.105
+nvidia-cudnn-cu12                 9.1.0.70
+nvidia-cufft-cu12                 11.0.2.54
+nvidia-cufile-cu12                1.11.1.6
+nvidia-curand-cu12                10.3.2.106
+nvidia-cusolver-cu12              11.4.5.107
+nvidia-cusparse-cu12              12.1.0.106
+nvidia-cusparselt-cu12            0.6.3
+nvidia-nccl-cu12                  2.21.5
+nvidia-nvjitlink-cu12             12.6.85
+nvidia-nvtx-cu12                  12.1.105
+oauthlib                          3.2.0
+opencv-python-headless            4.11.0.86
+openpyxl                          3.1.5
+overrides                         7.4.0
+packaging                         23.2
+pandas                            2.2.3
+pandocfilters                     1.5.0
+parso                             0.8.3
+pexpect                           4.8.0
+pillow                            11.2.1
+pip                               25.1.1
+platformdirs                      3.11.0
+pluggy                            1.5.0
+prometheus-client                 0.18.0
+prompt-toolkit                    3.0.39
+psutil                            5.9.6
+ptyprocess                        0.7.0
+pure-eval                         0.2.2
+pyclipper                         1.3.0.post6
+pycparser                         2.21
+pydantic                          2.11.4
+pydantic_core                     2.33.2
+pydantic-settings                 2.9.1
+Pygments                          2.16.1
+PyGObject                         3.42.1
+PyJWT                             2.3.0
+pylatexenc                        2.10
+pyparsing                         2.4.7
+pypdfium2                         4.30.1
+python-apt                        2.4.0+ubuntu2
+python-bidi                       0.6.6
+python-dateutil                   2.8.2
+python-docx                       1.1.2
+python-dotenv                     1.1.0
+python-json-logger                2.0.7
+python-pptx                       1.0.2
+pytz                              2025.2
+PyYAML                            6.0.1
+pyzmq                             24.0.1
+referencing                       0.30.2
+regex                             2024.11.6
+requests                          2.32.3
+rfc3339-validator                 0.1.4
+rfc3986-validator                 0.1.1
+rich                              14.0.0
+rpds-py                           0.12.0
+rtree                             1.4.0
+safetensors                       0.5.3
+scikit-image                      0.25.2
+scipy                             1.15.3
+SecretStorage                     3.3.1
+semchunk                          2.2.2
+Send2Trash                        1.8.2
+setuptools                        68.2.2
+shapely                           2.1.0
+shellingham                       1.5.4
+six                               1.16.0
+sniffio                           1.3.0
+soupsieve                         2.5
+stack-data                        0.6.3
+sympy                             1.13.1
+tabulate                          0.9.0
+terminado                         0.17.1
+tifffile                          2025.5.10
+tinycss2                          1.2.1
+tokenizers                        0.21.1
+tomli                             2.0.1
+torch                             2.5.1+cu121
+torchaudio                        2.5.1+cu121
+torchvision                       0.20.1+cu121
+tornado                           6.3.3
+tqdm                              4.67.1
+traitlets                         5.13.0
+transformers                      4.51.3
+triton                            3.1.0
+typer                             0.15.3
+types-python-dateutil             2.8.19.14
+typing_extensions                 4.13.2
+typing-inspection                 0.4.0
+tzdata                            2025.2
+uri-template                      1.3.0
+urllib3                           1.26.13
+wadllib                           1.3.6
+wcwidth                           0.2.9
+webcolors                         1.13
+webencodings                      0.5.1
+websocket-client                  1.6.4
+wheel                             0.41.3
+widgetsnbextension                4.0.9
+XlsxWriter                        3.2.3
+zipp                              1.0.0
+Note: you may need to restart the kernel to use updated packages.
+
